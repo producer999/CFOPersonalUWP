@@ -1,0 +1,93 @@
+FinancialMonth.cs
+_________________
+
+8/30/2017
+public void UpdateReceiptType(Receipt receipt, ReceiptTypeObject newType)
+        {
+            ReceiptTypeObject prevType = receipt.Type;
+
+            receipt.Type = newType;
+
+            //UpdateItem(receipt);
+
+            //newType.Refresh();
+            newType.AddReceipt(receipt);
+
+            //if(ItemTypes.ReceiptTypes.Any(t => t.Id == newType.Id))
+            //{
+            //    ReceiptTypeObject newTypeInList = ItemTypes.ReceiptTypes.Where(t => t.Id == newType.Id).First();
+            //    newTypeInList.AddReceipt(receipt);
+            //}
+
+            if (prevType != null)
+            {
+                //prevType.Refresh();
+                prevType.RemoveReceipt(receipt);
+
+                int typeIndex = ItemTypes.ReceiptTypes.IndexOf(prevType);
+                //int recIndex = ItemTypes.ReceiptTypes[typeIndex].Receipts.IndexOf(receipt);
+                ItemTypes.ReceiptTypes[typeIndex].Receipts.Remove(receipt);
+                //prevTypeInList.RemoveReceipt(receipt);
+            }
+
+            UpdateItem(receipt);
+        }
+
+8/30/2017
+public void UpdateReceiptPayee(Receipt receipt, Payee newPayee)
+        {
+            Payee prevPayee = receipt.Payee;
+
+            receipt.Payee = newPayee;
+
+            UpdateItem(receipt);
+
+            newPayee.Refresh();
+            if (prevPayee != null)
+            {
+                prevPayee.Refresh();
+            }
+        }
+
+8/30/2017
+public void UpdateExpenseType(Expense expense, ExpenseTypeObject newType)
+        {
+            ExpenseTypeObject prevType = expense.Type;
+
+            expense.Type = newType;
+
+            UpdateItem(expense);
+
+            newType.Refresh();
+            if(prevType != null)
+            {
+                prevType.Refresh();
+            }
+        }
+
+9/1/2017
+ <ListView x:Name="BudgetListView" Background="Transparent" Margin="15,10,10,20" Width="465" ScrollViewer.VerticalScrollMode="Disabled"
+                                      ItemsSource="{x:Bind CurrentMonth.BudgetList, Mode=OneWay}" HorizontalAlignment="Left" CanReorderItems="True" AllowDrop="True"
+                                          local:SingleSelectionGroup.GroupName="ListGroup1" SelectedItem="{x:Bind CurrentMonth.CurrentBudget, Mode=TwoWay}"
+                                              ItemClick="BudgetListView_ItemClick" IsItemClickEnabled="True">
+
+
+9/1/2017
+<ListView x:Name="ExpenseListView" Background="Transparent" Margin="15,10,-15,20" Width="495" 
+                                  ScrollViewer.VerticalScrollMode="Disabled"
+                                      ItemsSource="{x:Bind CurrentMonth.ExpenseList, Mode=OneWay}" 
+                                  SelectedItem="{x:Bind CurrentMonth.CurrentExpense, Mode=TwoWay}"
+                                  HorizontalAlignment="Left" CanReorderItems="True" AllowDrop="True"                                          
+                                              local:SingleSelectionGroup.GroupName="ListGroup1"
+                                  SelectionChanged="ListView_SelectionChanged">                               
+
+9/1/2017
+<ListView x:Name="IncomeListView" Background="Transparent" Margin="15,10,10,20" Width="465" ScrollViewer.VerticalScrollMode="Disabled"
+                                            ItemsSource="{x:Bind CurrentMonth.IncomeList, Mode=OneWay}" HorizontalAlignment="Left" CanReorderItems="True" AllowDrop="True"
+                                            local:SingleSelectionGroup.GroupName="ListGroup1"
+                                        SelectionChanged="ListView_SelectionChanged">                                                 
+
+ 9/2/2017
+ ^\$[1-9]\d{0,2}?(?:,\d{3})*(?:\.\d{2})$
+
+ ^(\$[1-9]\d{0,2}?(?:,\d{3})*|\$0)(?:\.\d{2})$

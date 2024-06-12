@@ -1,0 +1,58 @@
+
+CONVERTERS
+__________
+
+LightSeaGreen - Edit Mode Text Foreground
+
+Complete Button Completed Foreground
+
+Invalid Amount Foreground
+
+BACKGROUND
+__________
+
+#353535
+
+Transparent
+
+DarkGray
+
+DarkBlue
+
+#2f78ed - Add Receipt Button Background
+
+Black - Receipt List Item Background, Opacity .4
+
+
+FOREGROUND
+__________
+
+#f6ff70 - Lagre Text Pale Yellow
+
+White - Main Text
+
+Transparent - Hidden Button Text
+
+LightGray - Remaining Budget Amount, ?? do search
+	    Receipt List Secondary Text (slightly darker than white)
+	    Receipt Editor Value Text
+
+Yellow - Bar Chart Axis Labels (slightly darker than pale yellow)
+
+Yellow - Caution Symbol Foreground (keep static)
+
+LightSeaGreen - Alternate Heading Test
+
+
+BORDERBRUSH
+___________
+
+White - Main Border Color
+
+#2bd82e - Budget "Good"/"Income" Green Border Color
+
+#ff0000 - Budget "Bad"/"Expense" Red Border Color
+
+Orange - Budget "Neutral"/"Budget" Orange Border Color
+
+Red - Alert/Warning Red Border Color

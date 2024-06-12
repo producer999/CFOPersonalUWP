@@ -1,0 +1,704 @@
+﻿<Page
+    x:Class="CFOTest.FinancialYearView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CFOTest"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    xmlns:calc="using:Syncfusion.UI.Xaml.Controls.Input"
+    xmlns:calendar="using:Telerik.UI.Xaml.Controls.Input"
+    xmlns:cellmodel="using:Telerik.UI.Xaml.Controls.Input.Calendar"
+    mc:Ignorable="d"
+    
+    NavigationCacheMode="Required">
+
+    <Page.Resources>
+
+        <local:CustomCellStyleSelector x:Key="CustomCellStyleSelector" EventTemplate="{StaticResource CellEventTemplate}" />
+        <local:CustomCellStateSelector x:Key="CustomCellStateSelector"/>
+
+        <!-- Calendar Cell Event Template (for displaying receipt data in calendar cell) -->
+
+        <DataTemplate x:Key="CellEventTemplate" x:DataType="cellmodel:CalendarCellModel">
+            <Border BorderBrush="Red" BorderThickness="1" Background="Transparent"
+                    ToolTipService.Placement="Bottom"
+                    Tapped="ReceiptCalendarCell_Tapped">
+                <RelativePanel>
+                    <TextBlock x:Name="DayNumber" Text="{x:Bind Date.Day, Mode=OneTime}" Foreground="DarkGray" FontSize="12"
+                       RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True"
+                               FontFamily="Assets/Roboto-Normal.ttf#Roboto" Margin="2,-1,0,0"/>
+
+                    <TextBlock x:Name="CellExpenseAmountLabel" Text="{Binding Converter={StaticResource CellExpenseEventConverter}}" 
+                               FontSize="11" Foreground="Red" Margin="2,0,0,1"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"
+                                   TextAlignment="Left" HorizontalAlignment="Left"
+                               RelativePanel.Above="CellReceiptAmountLabel" RelativePanel.AlignLeftWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsExpenseDateVisibility2(Date), Mode=OneWay}"/>
+            
+                    <TextBlock x:Name="RedExpenseDot" Text="&#xE91F;" Foreground="Red" FontSize="13" 
+                       FontFamily="Segoe MDL2 Assets" Margin="0,2,4,0"
+                               RelativePanel.LeftOf="YellowReceiptDot" RelativePanel.AlignTopWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsExpenseDateVisibility2(Date), Mode=OneWay}"/>
+                    <TextBlock x:Name="ExpenseDotCount" Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetExpenseCountFromDate2(Date), Mode=OneWay}" 
+                               Foreground="White" FontSize="9" HorizontalAlignment="Center"
+                       FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="0,2.5,7.5,0"
+                               RelativePanel.LeftOf="YellowReceiptDot" RelativePanel.AlignTopWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsExpenseDateVisibility2(Date), Mode=OneWay}"/>
+                    
+                    <TextBlock x:Name="YellowReceiptDot" Text="&#xE91F;" Foreground="Yellow" FontSize="13" 
+                       FontFamily="Segoe MDL2 Assets" Margin="0,2,2,0"
+                               RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsReceiptDateVisibility2(Date), Mode=OneWay}"/>
+                    <TextBlock x:Name="ReceiptDotCount" Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetReceiptCountFromDate2(Date), Mode=OneWay}" 
+                               Foreground="DarkBlue" FontSize="9" HorizontalAlignment="Center"
+                       FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="1,2.5,5.5,0"
+                               RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsReceiptDateVisibility2(Date), Mode=OneWay}"/>
+                    
+                    <TextBlock x:Name="CellReceiptAmountLabel" Text="{Binding Converter={StaticResource CellReceiptEventConverter}}" 
+                       Foreground="Yellow" FontSize="11" VerticalAlignment="Bottom" Margin="2,0,0,2"
+                       FontFamily="Assets/Roboto-Bold.ttf#Roboto"
+                                RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignBottomWithPanel="True"
+                               Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsReceiptDateVisibility2(Date), Mode=OneWay}"/>
+                </RelativePanel>
+
+                <!-- CALENDAR CELL FLYOUT -->
+                
+                <FlyoutBase.AttachedFlyout>
+                    <Flyout x:Name="ReceiptPopup">
+                        <Border BorderBrush="White" BorderThickness="0" Padding="0" Width="280">
+                            <StackPanel Orientation="Vertical">
+                                
+                                <!-- CURRENT CALENDAR DATE HEADER -->
+                                
+                                <toolkit:DropShadowPanel x:Name="CalendarDate" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="-6,0,0,10">
+                                    <TextBlock Text="{x:Bind Date, Mode=OneWay, Converter={StaticResource DateFormatConverter}}" 
+                                               Margin="3,3,3,3" FontSize="16" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="White" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                </toolkit:DropShadowPanel>
+
+                                <!-- CALENDAR DATE EXPENSE INFO -->
+
+                                <StackPanel Orientation="Vertical" Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsExpenseDateVisibility2(Date), Mode=OneWay}">
+                                    <RelativePanel Width="280">
+                                        <toolkit:DropShadowPanel x:Name="ExpenseTitle" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="0,0,-10,0" RelativePanel.AlignLeftWithPanel="True">
+                                            <TextBlock Text="Expenses" 
+                                               Margin="3,3,3,3" FontSize="16" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="#f6ff70" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                        </toolkit:DropShadowPanel>
+
+                                        <toolkit:DropShadowPanel x:Name="ExpenseTotal" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="-6,-2,0,0" RelativePanel.AlignRightWithPanel="True">
+                                            <TextBlock Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetExpenseTotalFromDate2(Date), Mode=OneWay}" 
+                                               Margin="3,3,3,3" FontSize="18" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="White" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                        </toolkit:DropShadowPanel>
+                                    </RelativePanel>
+
+                                    <ListView ItemsSource="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetExpensesFromDate2(Date), Mode=OneWay}"
+                                              IsHitTestVisible="False" HorizontalAlignment="Left" Padding="0" HorizontalContentAlignment="Left"
+                                      BorderBrush="Orange" BorderThickness="0" Margin="2,0,0,0" Width="277">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:Expense">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Border BorderBrush="Red" BorderThickness="1" Margin="-10,0,-10,0">
+                                                        <TextBlock Foreground="White" FontFamily="Assets/Roboto-Normal.ttf#Roboto" 
+                                                               VerticalAlignment="Center" FontSize="12">
+                                                        <Run Text="{x:Bind Amount, Mode=OneWay, Converter={StaticResource CurrencyFormatConverter}}"
+                                                             FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                                                        <Run Text=" is due to "/>
+                                                        <Run Text="{x:Bind Payee.Label, Mode=OneWay}"
+                                                             Foreground="Yellow"/>
+                                                        <Run Text=" for "/>
+                                                        <Run Text="{x:Bind Label, Mode=OneWay}"
+                                                             FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                                                        </TextBlock>
+                                                    </Border>
+                                                    <TextBlock Text="&#xE73E;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                                               Foreground="Yellow"
+                                                                   Visibility="{x:Bind IsPaid, Mode=OneWay}" Margin="12,2,0,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                    
+                                </StackPanel>
+
+                                <!-- CALENDAR DATE RECEIPT INFO -->
+
+                                <StackPanel Orientation="Vertical" Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsReceiptDateVisibility2(Date), Mode=OneWay}">
+                                    <RelativePanel Width="280">
+                                        <toolkit:DropShadowPanel x:Name="ReceiptTitle" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="0,0,-10,0" RelativePanel.AlignLeftWithPanel="True">
+                                            <TextBlock Text="Receipts" 
+                                               Margin="3,3,3,3" FontSize="16" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="#f6ff70" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                        </toolkit:DropShadowPanel>
+                                        <!--<TextBox x:Name="ReceiptTabTextDivider" Style="{StaticResource TransparentTextBox}" 
+                                                         IsReadOnly="True" Foreground="White"
+                                                        FontFamily="Segoe MDL2 Assets" Text="&#xE09F;"
+                                                        FontSize="11" Margin="0,4,0,0" MinWidth="3" MinHeight="3"
+                                                        RelativePanel.RightOf="ReceiptTitle"/>-->
+                                        <!--<toolkit:DropShadowPanel x:Name="ReceiptDate" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="-6,0,0,0" RelativePanel.RightOf="ReceiptTabTextDivider">
+                                            <TextBlock Text="{x:Bind Date, Mode=OneWay, Converter={StaticResource DateFormatConverter}}" 
+                                               Margin="3,3,3,3" FontSize="16" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="White" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                        </toolkit:DropShadowPanel>-->
+                                        <toolkit:DropShadowPanel x:Name="ReceiptTotal" BlurRadius="2" ShadowOpacity="0.7" OffsetX="5" OffsetY="6"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                         Margin="-6,-2,0,0" RelativePanel.AlignRightWithPanel="True">
+                                            <TextBlock Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetReceiptTotalFromDate2(Date), Mode=OneWay}" 
+                                               Margin="3,3,3,3" FontSize="18" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                               Foreground="White" TextAlignment="Left" VerticalAlignment="Bottom"/>
+                                        </toolkit:DropShadowPanel>
+                                    </RelativePanel>
+
+                                    <ListView ItemsSource="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetReceiptsFromDate2(Date), Mode=OneWay}"
+                                      IsHitTestVisible="False" HorizontalAlignment="Left" Padding="0" HorizontalContentAlignment="Left"
+                                      BorderBrush="Orange" BorderThickness="0" Margin="2,0,0,0" Width="277">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:Receipt">
+                                                <RelativePanel  Height="30" HorizontalAlignment="Stretch" Width="276"
+                                                    BorderBrush="Red" BorderThickness="0,0,0,1" Margin="-13,0,-12,0">
+                                                    <Border x:Name="ReceiptColor" BorderBrush="Transparent" BorderThickness="0" Width="9" Height="9"
+                                                    Background="{x:Bind Type.ColorHexString, Converter={StaticResource HexStringToColorConverter}}"
+                                                    RelativePanel.AlignLeftWithPanel="True" Margin="0,13,5,0"/>
+                                                    <TextBlock x:Name="ReceiptLabel" Text="{x:Bind Label, Mode=OneWay}" FontSize="13" Margin="2,9,2,0"
+                                                   FontFamily="Assets/Roboto-Normal.ttf#Roboto" VerticalAlignment="Bottom"
+                                                     RelativePanel.RightOf="ReceiptColor" />
+                                                    <TextBlock x:Name="ReceiptPayee" Text="{x:Bind Payee.Label}" FontSize="12" Margin="8,11,2,0"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" VerticalAlignment="Bottom"
+                                                        RelativePanel.RightOf="ReceiptLabel"/>
+                                                    <TextBlock Text="{x:Bind Amount, Mode=OneWay, Converter={StaticResource CurrencyFormatConverter}}"
+                                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="15" Margin="14,7,0,0"
+                                                       VerticalAlignment="Bottom"
+                                                       RelativePanel.AlignRightWithPanel="True"/>
+
+                                                </RelativePanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </StackPanel>
+
+                            </StackPanel>
+                        </Border>
+                    </Flyout>
+                </FlyoutBase.AttachedFlyout>
+
+                <!-- RECEIPT CELL TOOLTIP -->
+
+                <ToolTipService.ToolTip>
+                    <ToolTip>
+                        <Border BorderBrush="White" BorderThickness="0" Padding="0">
+                            <StackPanel Orientation="Vertical" >
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsReceiptDateVisibility2(Date), Mode=OneWay}">
+                                    <TextBlock Text="Number of receipts: " FontFamily="Assets/Roboto-Normal.ttf#Roboto" Margin="3"/>
+                                    <TextBlock Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetReceiptCountFromDate2(Date), Mode=OneWay}"
+                                           FontFamily="Assets/Roboto-Normal.ttf#Roboto" Margin="3"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).IsExpenseDateVisibility2(Date), Mode=OneWay}">
+                                    <TextBlock Text="Expenses due: " FontFamily="Assets/Roboto-Normal.ttf#Roboto" Margin="3"/>
+                                    <TextBlock Text="{x:Bind ((local:FinancialYear)((calendar:RadCalendar)Presenter).DataContext).GetExpenseCountFromDate2(Date), Mode=OneWay}"
+                                           FontFamily="Assets/Roboto-Normal.ttf#Roboto" Margin="3"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </ToolTip>
+                </ToolTipService.ToolTip>
+                
+            </Border>
+        </DataTemplate>
+
+    </Page.Resources>
+
+
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TOP CONTROL STRIP -->
+
+        <RelativePanel Grid.Row="0">
+
+            <TextBlock x:Name="YearViewTitle" Text="Year View" Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="20"
+                               Margin="10,13,10,0" RelativePanel.AlignLeftWithPanel="True" VerticalAlignment="Center"/>
+            <!--<TextBlock x:Name="TrialVersionLabel"  Text="Trial Version -" Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="18"
+                       RelativePanel.RightOf="YearViewTitle" Margin="10,15,0,0" FontWeight="Bold"
+                       Visibility="{x:Bind appSettings.IsLicenseTrial, Mode=OneWay}"/>
+            <TextBlock x:Name="TrialVersionExpiration"  Text="{x:Bind appSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetTrialDaysFormatConverter}}" 
+                       Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="18"
+                       RelativePanel.RightOf="TrialVersionLabel" Margin="2,15,10,0" FontWeight="Bold"
+                       Visibility="{x:Bind appSettings.IsLicenseTrial, Mode=OneWay}"/>-->
+            <TextBlock Text="Choose date:" Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                               Margin="10,17,10,0" RelativePanel.LeftOf="DatePicker" VerticalAlignment="Bottom"/>
+            <CalendarDatePicker x:Name="DatePicker" Margin="5,10,10,10" Foreground="White" DisplayMode="Year"
+                                        RelativePanel.LeftOf="TodayButton"
+                                    DateChanged="CalendarPicker_DateChanged"
+                                CalendarViewStyle="{StaticResource CustomCalendarView}"/>
+            <Border x:Name="TodayButton" BorderBrush="White" BorderThickness="1"
+                            RelativePanel.AlignRightWithPanel="True"  Margin="5,10,13,10">
+                <Button Style="{StaticResource NoClickBackgroundButtonTemplate}"
+                                FontFamily="Assets/Roboto-Thin.ttf#Roboto" Foreground="White"
+                            BorderThickness="0" Content="Today" Height="30" Background="Transparent"
+                        Click="TodayButton_Click"/>
+            </Border>
+        </RelativePanel>
+
+        <!-- MAIN SECTION -->
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- YEAR DISPLAY AND GRAND TOTALS DISPLAY -->
+
+            <RelativePanel Grid.Row="0" MinWidth="1020">
+
+                <Border x:Name="YearDisplay" BorderThickness="3" Grid.Row="0" Margin="10,0,10,0" BorderBrush="White" CornerRadius="5" HorizontalAlignment="Left"
+                                RelativePanel.AlignLeftWithPanel="True" Background="Transparent"
+                                PointerEntered="YearOverlay_PointerEntered"
+                                PointerExited="YearOverlay_PointerExited">
+                    <RelativePanel HorizontalAlignment="Stretch">
+
+                        <TextBlock Text="{x:Bind CurrentYear.Year, Mode=OneWay}" 
+                                           Margin="20,15,20,20" Foreground="White" FontSize="60" FontWeight="Bold"/>
+                        <Button x:Name="PreviousYearButton" Height="50" Width="25" RelativePanel.AlignLeftWithPanel="True"
+                                        RelativePanel.AlignVerticalCenterWithPanel="True" Opacity="0"
+                                               Background="DarkGray" FontFamily="Segoe MDL2 Assets" Content="&#xE938;"
+                                                Foreground="White" Padding="0" Margin="-13,0,0,0"
+                                        HorizontalContentAlignment="Left"
+                                        Click="ChangeYearButton_Click"/>
+                        <Button x:Name="NextYearButton" Height="50" Width="25"  RelativePanel.AlignRightWithPanel="True"
+                                        RelativePanel.AlignVerticalCenterWithPanel="True" VerticalContentAlignment="Center"
+                                               Background="DarkGray" FontFamily="Segoe MDL2 Assets" Content="&#xE937;"
+                                                Foreground="White" Padding="0" Margin="0,0,-13,0" Opacity="0"
+                                        HorizontalContentAlignment="Right"
+                                        Click="ChangeYearButton_Click"/>
+                    </RelativePanel>
+                </Border>
+                
+                <StackPanel Orientation="Vertical" RelativePanel.RightOf="YearDisplay" 
+                            RelativePanel.AlignBottomWithPanel="True" Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="RedExpenseDot" Text="&#xE91F;" Foreground="Red" FontSize="13"
+                                   FontFamily="Segoe MDL2 Assets" Margin="0,2,5,0"/>
+                        <TextBlock Text="Expenses Due" FontFamily="Assets/Roboto-Thin.ttf#Roboto" Foreground="White" FontSize="13"
+                                   VerticalAlignment="Center" Margin="0,0,0,3"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="YellowReceiptDot" Text="&#xE91F;" Foreground="Yellow" FontSize="13" 
+                                   FontFamily="Segoe MDL2 Assets" Margin="0,2,5,0"/>
+                        <TextBlock Text="Receipts" FontFamily="Assets/Roboto-Thin.ttf#Roboto" Foreground="White" FontSize="13"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border x:Name="ExpenseTotalDisplay" BorderThickness="3" Grid.Row="0" Margin="10,0,10,0" BorderBrush="Red" CornerRadius="5" HorizontalAlignment="Left"
+                                RelativePanel.LeftOf="ReceiptTotalDisplay">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Bind CurrentYear.ExpensesGrandTotal, Mode=OneWay, Converter={StaticResource CurrencyFormatConverter}}" Margin="20,-2,20,0" Foreground="White" FontSize="60" FontWeight="Bold"></TextBlock>
+                        <TextBlock Text="expenses this year" Margin="10,0,10,10" Foreground="White" FontSize="20" TextAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border x:Name="ReceiptTotalDisplay" BorderThickness="3" Grid.Row="0" Margin="10,0,10,0" BorderBrush="Yellow" CornerRadius="5" HorizontalAlignment="Left"
+                                RelativePanel.AlignRightWithPanel="True">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{x:Bind CurrentYear.ReceiptsGrandTotal, Mode=OneWay, Converter={StaticResource CurrencyFormatConverter}}" Margin="20,-2,20,0" Foreground="White" FontSize="60" FontWeight="Bold"></TextBlock>
+                        <TextBlock Text="receipts this year" Margin="10,0,10,10" Foreground="White" FontSize="20" TextAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Border>
+
+            </RelativePanel>
+
+            <Grid Grid.Row="1">
+
+                <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" Margin="0,20,0,0"
+                              ZoomMode="Enabled" MinZoomFactor="1">
+                    <StackPanel Orientation="Vertical">
+                        
+                        <!-- CALENDAR VIEW -->
+
+                        <GridView HorizontalAlignment="Center" IsHitTestVisible="True">
+
+                            <!-- JANUARY -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True" Margin="5"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="January"
+                                                  
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[0], Mode=OneWay}"
+                                                  
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+                                
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- FEBRUARY -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="February"
+                                                
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[1], Mode=OneWay}"
+                                                 
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- MARCH -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="March"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[2], Mode=OneWay}"
+                                                 
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- APRIL -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="April"
+                                                  
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[3], Mode=OneWay}"
+                                                 
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- MAY -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="May"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[4], Mode=OneWay}"
+                                                  
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- JUNE -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="June"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[5], Mode=OneWay}"
+                                                 
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- JULY -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="July"
+                                                  
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[6], Mode=OneWay}"
+                                                 
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- AUGUST -->
+
+                            <calendar:RadCalendar x:Name="August"
+                                                  Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="August"
+                                                  
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[7], Mode=OneWay}"
+                                                  
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- SEPTEMBER -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True" 
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="September"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[8], Mode=OneWay}"
+                                                  
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- OCTOBER -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="October"
+                                               
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[9], Mode=OneWay}"
+                                               
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- NOVEMBER -->
+
+                            <calendar:RadCalendar Width="420" Height="402" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="November"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[10], Mode=OneWay}"
+                                                
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+
+                            <!-- DECEMBER -->
+
+                            <calendar:RadCalendar Width="420" Height="400" SelectionMode="None"
+                                                  IsTodayHighlighted="True"
+                                                  NavigationArrowsVisibility="Collapsed"
+                                                  GridLinesThickness="1" GridLinesBrush="White"
+                                                  BorderBrush="White" BorderThickness="1"
+                                                  FontFamily="Assets/Roboto-Normal.ttf#Roboto"
+                                                  MonthViewHeaderFormat="December"
+                                                 
+                                                  DisplayDate="{x:Bind CurrentYear.CalendarStartDates[11], Mode=OneWay}"
+                                                
+                                                  NormalCellStyle="{StaticResource StandardCellStyle}"
+                                                  AnotherViewCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  BlackoutCellStyle="{StaticResource OutOfCurrentMonthCellStyle}"
+                                                  HighlightedCellStyle="{StaticResource HighlightCellStyle}"
+                                                  CellStyleSelector="{StaticResource CustomCellStyleSelector}"
+                                                  CellStateSelector="{StaticResource CustomCellStateSelector}">
+
+                                <calendar:RadCalendar.Commands>
+                                    <local:CustomMoveToPreviousViewCommand/>
+                                    <local:CustomMoveToNextViewCommand/>
+                                    <local:CustomMoveToUpperViewCommand/>
+                                    <local:CustomMoveToLowerViewCommand/>
+                                    <local:CustomCellTapCommand/>
+                                </calendar:RadCalendar.Commands>
+                            </calendar:RadCalendar>
+                            
+                        </GridView>
+                        
+
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Grid>
+        </Grid>
+
+        <!-- LOADING PROGRESS PAGE -->
+
+        <toolkit:Loading x:Name="LoadingPage" HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Background="DarkBlue" Opacity=".9"
+                                 Grid.Row="0" Grid.RowSpan="2"
+                                 IsLoading="{x:Bind CurrentYear.IsLoading, Mode=OneWay}">
+            <RelativePanel>
+                <ProgressRing x:Name="LoadingRing" IsActive="True" RelativePanel.AlignLeftWithPanel="True"
+                                      Foreground="White"
+                                      Height="60" Width="60"/>
+                <TextBlock RelativePanel.RightOf="LoadingRing"
+                                   Text="Loading Data..." Margin="20,10,10,10"
+                                   Foreground="White" FontSize="35" FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+            </RelativePanel>
+        </toolkit:Loading>
+        
+    </Grid>
+</Page>

@@ -1,0 +1,294 @@
+﻿<Page
+    x:Class="CFOTest.ReceiptArchiveView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CFOTest"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    xmlns:calc="using:Syncfusion.UI.Xaml.Controls.Input"
+    xmlns:grid="using:Syncfusion.UI.Xaml.Grid"
+    mc:Ignorable="d"
+    
+    NavigationCacheMode="Required">
+
+    <Page.Resources>
+        
+        <DataTemplate x:Key="GridCellTemplateNormal">
+            <TextBlock Foreground="#f6ff70" FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                       Text="{Binding Value}" VerticalAlignment="Center" Margin="10"
+                       FontSize="15"/>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="GridCellTemplateBold">
+            <TextBlock Foreground="White" FontFamily="Assets/Roboto-Bold.ttf#Roboto"
+                       Text="{Binding Value}" VerticalAlignment="Center" Margin="10"
+                       FontSize="17"/>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="GridCellTemplateLight">
+            <TextBlock Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                       Text="{Binding Value}" VerticalAlignment="Center" Margin="0,10,0,10"
+                       FontSize="15" TextWrapping="Wrap" TextAlignment="Center"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GridCellTemplateLightNotes">
+            <TextBlock Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                       Text="{Binding Value}" VerticalAlignment="Center" Margin="10"
+                       FontSize="13" MaxWidth="241" MaxHeight="100" TextWrapping="Wrap"/>
+        </DataTemplate>
+
+        <Style x:Key="GridHeaderStyle" TargetType="grid:GridHeaderCellControl">
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderThickness" Value="0,0,0,3"/>
+            <Setter Property="FontFamily" Value="Assets/Roboto-Bold.ttf#Roboto"/>
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Foreground" Value="#f6ff70" />
+        </Style>
+
+        <Style TargetType="grid:GridCell">
+            <Setter Property="BorderBrush" Value="Orange"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Background" Value="DarkBlue"/>
+        </Style>
+        
+    </Page.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- TOP CONTROL STRIP -->
+
+        <RelativePanel Grid.Row="0">
+
+            <TextBlock x:Name="ReceiptArchiveTitle" Text="Receipt Archive" Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="20"
+                               Margin="10,13,10,0" RelativePanel.AlignLeftWithPanel="True" VerticalAlignment="Center"/>
+            <!--<TextBlock x:Name="TrialVersionLabel"  Text="Trial Version -" Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="18"
+                       RelativePanel.RightOf="ReceiptArchiveTitle" Margin="10,15,0,0" FontWeight="Bold"
+                       Visibility="{x:Bind appSettings.IsLicenseTrial, Mode=OneWay}"/>
+            <TextBlock x:Name="TrialVersionExpiration"  Text="{x:Bind appSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetTrialDaysFormatConverter}}" 
+                       Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="18"
+                       RelativePanel.RightOf="TrialVersionLabel" Margin="2,15,10,0" FontWeight="Bold"
+                       Visibility="{x:Bind appSettings.IsLicenseTrial, Mode=OneWay}"/>-->
+            <TextBlock Text="Choose date:" Foreground="DarkBlue" FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                               Margin="10,17,10,0" RelativePanel.LeftOf="DatePicker" VerticalAlignment="Bottom"/>
+            <CalendarDatePicker x:Name="DatePicker" Margin="5,10,10,10" Foreground="White" DisplayMode="Year"
+                                        RelativePanel.LeftOf="TodayButton"
+                                IsEnabled="False"
+                                CalendarViewStyle="{StaticResource CustomCalendarView}"/>
+            <Border x:Name="TodayButton" BorderBrush="DarkBlue" BorderThickness="1"
+                            RelativePanel.AlignRightWithPanel="True"  Margin="5,10,13,10">
+                <Button Style="{StaticResource NoClickBackgroundButtonTemplate}"
+                                FontFamily="Assets/Roboto-Thin.ttf#Roboto" Foreground="White"
+                            BorderThickness="0" Content="Today" Height="30" Background="Transparent"
+                        IsEnabled="False"/>
+            </Border>
+        </RelativePanel>
+
+        <!-- MAIN SECTION -->
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- HEADER DISPLAY -->
+
+            <RelativePanel Grid.Row="0" MinWidth="800">
+
+                <Border x:Name="ReceiptArchiveDisplay" BorderThickness="3" Grid.Row="0" Margin="10,0,10,0" 
+                            BorderBrush="White" CornerRadius="5" HorizontalAlignment="Left"
+                                RelativePanel.AlignLeftWithPanel="True" Background="Transparent">
+                    <RelativePanel HorizontalAlignment="Stretch">
+                        <TextBlock Text="Receipt Archive" 
+                                           Margin="20,15,20,20" Foreground="White" FontSize="60" FontWeight="Bold"/>
+                    </RelativePanel>
+                </Border>
+            </RelativePanel>
+
+            <Grid Grid.Row="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- GRID SEARCH BAR AND CONTROLS -->
+
+                <RelativePanel Grid.Row="0" Margin="0,40,0,20" MinWidth="1175">
+                    <TextBlock x:Name="SearchLabel" Text="Search:" Margin="10,10,10,15"
+                               FontFamily="Assets/Roboto-Bold.ttf#Roboto" Foreground="White" FontSize="18"
+                               VerticalAlignment="Bottom" TextAlignment="Right"
+                               RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignBottomWithPanel="True"/>
+                    <AutoSuggestBox x:Name="SearchBox" Margin="10" RelativePanel.AlignBottomWithPanel="True" 
+                                    RelativePanel.RightOf="SearchLabel" Width="300" VerticalAlignment="Center"
+                                    TextChanged="ReceiptSearch_TextChanged">
+                        <AutoSuggestBox.TextBoxStyle>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource TransparentTextBox}">
+                                <Setter Property="BorderBrush" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                <Setter Property="FontFamily" Value="Assets/Roboto-Thin.ttf#Roboto"/>
+                                <Setter Property="FontSize" Value="16"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="Padding" Value="8,7,0,0"/>
+                                <Setter Property="IsSpellCheckEnabled" Value="False"/>
+                            </Style>
+                        </AutoSuggestBox.TextBoxStyle>
+                    </AutoSuggestBox>
+                    <CheckBox x:Name="OcrCheckBox" RelativePanel.RightOf="SearchBox" Margin="20,10,10,10"
+                              RelativePanel.AlignBottomWithPanel="True" Foreground="DarkBlue"
+                              FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                              Content="Search Receipt OCR" IsChecked="False"/>
+                    <CheckBox x:Name="DeletedCheckBox" RelativePanel.RightOf="OcrCheckBox" Margin="20,10,10,10"
+                              RelativePanel.AlignBottomWithPanel="True" Foreground="DarkBlue"
+                              FontFamily="Assets/Roboto-Thin.ttf#Roboto"
+                              Content="Show Deleted Receipts" IsChecked="False"
+                              Checked="ShowDeletedReceipts_Checked"
+                              Unchecked="ShowDeletedReceipts_Unchecked"/>
+
+                    <toolkit:DropShadowPanel x:Name="ReceiptCountLabel" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,7,2,2"
+                                                                     RelativePanel.RightOf="DeletedCheckBox">
+                        <TextBlock x:Name="TotalText"  Margin="0,10,-8,0" Text="Total: " Foreground="White"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                    </toolkit:DropShadowPanel>
+
+                    <toolkit:DropShadowPanel x:Name="ReceiptCountText" BlurRadius="2" ShadowOpacity="0.7" OffsetX="13" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,7,0,2"
+                                                                     RelativePanel.RightOf="ReceiptCountLabel">
+                        <TextBlock x:Name="ReceiptTotal"  Margin="10,10,6,0" Text="{x:Bind Archive.CurrentViewCount, Mode=OneWay}" Foreground="White"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                    </toolkit:DropShadowPanel>
+
+                    <Button x:Name="RefreshButton" Content="Refresh" Margin="25,0,0,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" RelativePanel.LeftOf="ExportButton" RelativePanel.AlignBottomWithPanel="True"
+                                                        Visibility="Visible" VerticalAlignment="Bottom"
+                                                        Click="RefreshButton_Click"/>
+                    
+                    <Button x:Name="ExportButton" Content="Export" Margin="25,0,25,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignBottomWithPanel="True"
+                                                        Visibility="Visible" VerticalAlignment="Bottom"
+                                                        Click="ExportButton_Click"/>
+                </RelativePanel>
+
+                <Grid Grid.Row="1">
+
+                    <!-- RECEIPT DATA GRID -->
+                    
+                    <grid:SfDataGrid x:Name="dataGrid"
+                                 AutoGenerateColumns="False" Margin="10,10,10,10"
+                                     EnableDataVirtualization="True" AllowDraggingColumns="False"
+                                    RowSelectionBrush="#053b91" HeaderStyle="{StaticResource GridHeaderStyle}"
+                                     ColumnSizer="Auto" BorderThickness="0" BorderBrush="White" Background="Transparent"
+                                    CurrentCellBorderBrush="White" CurrentCellBorderThickness="1"
+                                     SelectionUnit="Cell" SelectionMode="Single"
+                                     AllowResizingColumns="True"
+                                     ItemsSource="{x:Bind Archive.CurrentReceiptData, Mode=OneWay}"
+                                 QueryRowHeight="ReceiptDataGrid_QueryRowHeight"
+                                     SelectionChanged="ReceiptDataGrid_SelectionChanged">
+
+                        <grid:SfDataGrid.Columns>
+                            <grid:GridImageColumn MappingName="ImageUrl" HeaderText=""
+                                             ValueBinding="{Binding ImageUrl, Converter={StaticResource PathToImageConverter}}"
+                                              StretchDirection="DownOnly" MaximumWidth="100"
+                                              TextAlignment="Center" Padding="5"
+                                              AllowSorting="False">
+                            </grid:GridImageColumn>
+                            <grid:GridTextColumn MappingName="Label" CellTemplate="{StaticResource GridCellTemplateBold}"
+                                             SetCellBoundValue="True"/>
+                            <grid:GridTextColumn MappingName="Amount" CellTemplate="{StaticResource GridCellTemplateBold}"
+                                             SetCellBoundValue="True"
+                                                 DisplayBinding="{Binding Amount, Converter={StaticResource CurrencyFormatConverter} }"/>
+                            <grid:GridTextColumn MappingName="TransactionDate" HeaderText="Transaction Date"
+                                              CellTemplate="{StaticResource GridCellTemplateLight}"
+                                             SetCellBoundValue="True"
+                                                 DisplayBinding="{Binding TransactionDate, Converter={StaticResource DateFormatConverter}}"/>
+                            <grid:GridTextColumn MappingName="Budget.Label" HeaderText="Budget"
+                                              CellTemplate="{StaticResource GridCellTemplateNormal}"
+                                             SetCellBoundValue="True"/>
+                            <grid:GridTextColumn MappingName="Payee.Label" HeaderText="Payee"
+                                              CellTemplate="{StaticResource GridCellTemplateNormal}"
+                                             SetCellBoundValue="True"/>
+                            <grid:GridTextColumn MappingName="Type.Label" HeaderText="Category">
+                                <grid:GridTextColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontFamily="Assets/Roboto-Bold.ttf#Roboto"
+                                                Text="{Binding Type.Label}" VerticalAlignment="Center" Margin="10"
+                                                 FontSize="15" Foreground="{Binding Type.ColorHexString, Mode=OneWay, Converter={StaticResource HexStringToColorConverter}}"/>
+                                    </DataTemplate>
+                                </grid:GridTextColumn.CellTemplate>
+                            </grid:GridTextColumn>
+                            <grid:GridTextColumn MappingName="Notes"
+                                              CellTemplate="{StaticResource GridCellTemplateLightNotes}"
+                                             SetCellBoundValue="True" TextWrapping="Wrap"
+                                             MaximumWidth="241"
+                                                 AllowSorting="False"/>
+                            <grid:GridTextColumn MappingName="CreationDate" HeaderText="Added Date"
+                                              CellTemplate="{StaticResource GridCellTemplateLight}"
+                                             SetCellBoundValue="True" 
+                                                 DisplayBinding="{Binding CreationDate, Converter={StaticResource DateFormatConverter}}"/>
+                        </grid:SfDataGrid.Columns>
+                    </grid:SfDataGrid>
+
+                    <!-- LOADING PROGRESS PAGE -->
+
+                    <toolkit:Loading x:Name="LoadingPage" HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Background="DarkBlue" Opacity=".9"
+                                 Grid.Row="0" Grid.RowSpan="2"
+                                 IsLoading="{x:Bind Archive.IsReceiptListLoading, Mode=OneWay}">
+                        <RelativePanel>
+                            <ProgressRing x:Name="LoadingRing" IsActive="True" RelativePanel.AlignLeftWithPanel="True"
+                                      Foreground="White"
+                                      Height="60" Width="60"/>
+                            <TextBlock RelativePanel.RightOf="LoadingRing"
+                                   Text="Loading Data..." Margin="20,10,10,10"
+                                   Foreground="White" FontSize="35" FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                        </RelativePanel>
+                    </toolkit:Loading>
+                    
+                </Grid>
+               
+
+            </Grid>
+        </Grid>
+
+        <!-- LARGE IMAGE POPUP -->
+
+        <Popup Grid.Row="1" x:Name="ReceiptEditorImageLargePopup" Height="2000" Width="550"
+                       IsLightDismissEnabled="False"
+                       Closed="ReceiptImagePopup_Closed">
+            <Border BorderBrush="White" BorderThickness="2" CornerRadius="4"
+                            Background="DarkBlue" Height="700" Width="550" ManipulationMode="TranslateX, TranslateY">
+                <RelativePanel>
+                    <Grid Background="Transparent" Margin="10" IsHitTestVisible="True">
+                        <ScrollViewer x:Name="LargeImagePopupScrollViewer" ZoomMode="Enabled" HorizontalScrollMode="Auto"
+                                          IsHorizontalRailEnabled="False" HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Hidden">
+                            <toolkit:ImageEx x:Name="ReceiptEditorImageLarge" Margin="0,0,0,0" Height="700" Width="525" Padding="0"
+                                             IsCacheEnabled="True">
+                                <toolkit:ImageEx.Source>
+                                    <BitmapImage UriSource="{x:Bind Archive.CurrentReceipt.ImageUrl, Mode=OneWay, Converter={StaticResource PathToUriConverter}}"/>
+                                </toolkit:ImageEx.Source>
+                            </toolkit:ImageEx>
+                        </ScrollViewer>
+                    </Grid>
+                    <Button Width="50" Height="50" Background="Transparent" IsEnabled="True"
+                                        Content="&#xE711;" FontSize="30" FontFamily="Segoe MDL2 Assets"
+                                        Foreground="White"
+                                        RelativePanel.AlignTopWithPanel="True" RelativePanel.AlignRightWithPanel="True"
+                                        Click="ReceiptImageCloseButton_Click">
+                    </Button>
+                </RelativePanel>
+
+            </Border>
+        </Popup>
+        
+    </Grid>
+</Page>

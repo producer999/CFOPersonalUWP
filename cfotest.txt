@@ -1,0 +1,274 @@
+Resources:
+
+https://stackoverflow.com/questions/12759507/multiple-wpf-listboxes-with-only-one-item-selected-at-a-time
+https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/custom-dependency-properties
+https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/custom-attached-properties
+https://stackoverflow.com/questions/634112/cast-sender-object-in-event-handler-using-gettype-name
+https://stackoverflow.com/questions/43155232/customizing-a-textbox-to-look-like-a-textblock-in-uwp
+https://stackoverflow.com/questions/15462383/regex-format-for-dollar-and-comma
+http://www.c-sharpcorner.com/UploadFile/tirthacs/remove-an-item-form-observable-collection-using-remove/
+https://github.com/jQuery2DotNet/UWP-Samples/blob/master/MessageDialog/MessageDialog/MainPage.xaml
+https://xamlbrewer.wordpress.com/2016/02/08/a-floating-panel-control-for-uwp/
+https://code.msdn.microsoft.com/windowsapps/Convert-PDF-File-To-Image-79107ccd
+https://stackoverflow.com/questions/30975176/access-datacontext-instance-in-code-when-set-in-xaml
+https://stackoverflow.com/questions/3973137/order-a-observablecollectiont-without-creating-a-new-one/27382401#27382401
+https://stackoverflow.com/questions/16562175/how-can-i-sort-observablecollection
+https://stackoverflow.com/questions/41577461/application-settings-binding-best-practices
+https://stackoverflow.com/questions/18248287/copy-folder-on-winrt
+
+
+Features To Add:
+
+****CamScanner API for scanning recipts (Android/iOS only)
+****get rid of all enums alltogether and populate each type from a textfile with the initial list of values
+****add setting to change background, header text color, recipt section color (bind the static resource colors to viewmodel)
+****next to month total remaining have a "save this amount?" button to fill a "savings" account?
+****add expense due warnings on summary page a few days before, adjustable via a setting
+****add expense overdue warnings until expense is marked as paid
+****hitting enter in textbox in list item saves the list item and makes it uneditable again - is it possible? Use plin binding?
+****find a way to move popup around using manipulation delta or subclassing Popup
+****use visual state to control width of the receipts box to show correctly on different resolutions
+****eventually make different layouts based on size
+****make it so you can use calculator in the receipt editor too
+****move collection of "new" colors for types to a text file that is imported into a database table on initialization
+****drag and drop image file onto the receipts list area when budget selected to add receipt
+****payee editor section where you can add the address and loaction of the payees
+****drag a receipt from one budget to another on the same page and it moves the receipt there (or copies, gives you a choice)
+****click on a chart to show a big view of the chart (for when lots of entries are there), use popup?
+****ability to print a receipt image from receipt editor and receipt archive
+****backup/import datebase button in settings
+****sort in both directions on listviews and receipt lists
+****different currencies (india, pakistan, europe)
+
+
+Bugs:
+
+****after changing the amount of a budget in list, when you change label it doesnt update label in chart anymore
+****import a database into installation of app that already has ListOrders settings throws exception, clear settings first on import
+****expense due date calendar pickers not opening to the currentexpense.Date even though the value is correct
+	-if you browse to a month in the future that has an expense, then go back to the first month, the first month calendar
+	 pops up as the farther in the future month that had an expense
+****taking photos with the camera API, or something else to do with images is buggy
+	-sometimes pictures need to be taken more than once to show the correct picture
+	-occasionally even if you change the picture more than once it still doesnt update, but when you restart the app,
+	 it doesn show the last image that you picked (as if it had been updating all along)
+****more optimization and testing
+
+
+Visual Bugs (future):
+
+****FIX when go to another month with a collapsed list, when go back and open it it turns gray first then shows
+****FIX when coming back from sleep the receipt images show all black
+****FIX: you can see the previous image in the Content dialog fora split second when going to new receipt
+	-when hit OK on dialog, clear the image source? and also in large popup?
+****put middle (data entry) section of receipt editor in vertical scrollviewer for when window is resized small
+
+
+USER EXPERIENCE
+
+****optimization
+****clicking on a chart makes it big
+****make it work well on windows phone
+****sync settings and data between all your devices (need to make some kind of log in?)
+	-instead of receipt backup folder make it data backup and sync folder, choose dropbox or G drive folder to sync
+
+
+
+ver 1.1.5 completed 11/14/17
+
+11/13/17
+****make it so hitting enter on income/expense/budget amount saves it
+****make so after typing new category in, after saving/mouse away, it adds the new category first if it doesnt exist
+
+11/9/17
+****after close app and come back, all income, expense, etc do not update the charts when edited, but do if you add them new
+	-when adding new item, the object put in the IncomeList and IncomeTypes list are the same new object
+	-when opening from database, the IncomeList and IncomeTypes lists are built separately so updating one obj doesnt do other
+	-need to mantually update it in UpdateItem() and UpdateReceipt() method in current month
+****tool tips over the textbox entry fields saying what field its supposed to be
+
+11/8/17
+****large totals fubar the integers (around 21,000,000.00), set a cap on income (and exp/budget) so that total cannot overflow
+****change regex to fix the dollar amounts instead of blocking unless bad chars or letters are entered
+
+11/7/17
+
+****running program with an existing database works correctly now, fixed missing receipt payee and category bug
+
+
+ver 1.1.4 completed 9/21/17:
+
+****finish help section
+****FIX cant enter a item value for less than $1 (cant have the leading zero)
+****add refresh button to receipt archive so when you clear deleted receipts whil in that view you can refresh
+****make clear deleted receipts button in settings
+****performance issues when dealing with receipt update/delete/add (figure out threading/async)
+****copy expense to next month doesnt work with having the data show up in the next months chart
+****add export to excel and pdf for receipt view
+****update receipts archive total to reflect total in search result
+****add duplicate item/receipt right click option
+****add duplicate receipt button
+****fix placement/size of list flyout rightclick menu buttons
+****add expense due today warning, turns off when you make it paid
+****add stats to top of summary page
+****if raising your budget total would put you in the negetive at the end of the month is spent whole budget, report that
+	-Income-Expense-BudgetTotal
+****Add button/option to carry over this months remaming amount to the next month as an income?
+****spending by payee? on month view summary
+****income by source? on month view summary
+****implement auto backup receipts folder on app close settings and functionality
+****right click on income, expense, budget to choose duplcate to # of months (or choose end date?) and just add to DB
+****clean up constructors and Add<T> methods
+****instead of binding to images in a selected folder (doesnt work), have user select a backup folder and copy all there
+	-copy automatically at app close?
+	-have setting for it and a backup now button in settings
+****clear temp files button in settings
+****converted SettingsHelper to a non staic class so it can be instantiated and bound to the settings page
+****clear temp folder at initialize Windows.Storage.ApplicationData.ClearAsync
+****hitting enter in an autosuggestbox for category shows a brief popup saying "new category created!
+****add an "are you sure?" when deleting items
+****FIX after going to receipt view, when receipt images are changed in month view, the images dont update anywhere anymore until restart
+	-reworked image system to delete the current image first if there is one, then add the mew image so it updates correctly in view
+****reworked receipt.imageurl to be the path of the file not the uri
+****add large image popup when clicking the receipt thumbnail in receipt archive
+****reload receipts into datagrid on page navigated to
+****finish search receipt section styling
+****add checkbox of whether to search in OCR as well
+****in all receipts mode, perform search that also searches through OCR text of the receipt, stored in database
+****add receipt archive search functionality
+****incorporate system to check other earnings besides the main budgets/expenses (like the business account)
+****page with history of items created (the archive section?) Table of all recipts ever entered?
+****Fix Can add a Category/Payee with the same name as an existing one if type it and hit enter
+****fixed visual glitches when loading month view and switching months by loading lists with Clear/Add instead of new
+****when saving images, strip punctuation from budget names and receipt names
+****finish implementing recipt sort
+****improved speed of list (collection) sorting and revmoed visual artifacts of old way
+****add due expenses to the calendar date flyout
+****add a button/flyout to right or listview header/add buttons to select the sorting of the lists
+****when importing or taking a receipt photo, grabs OCR text and stores it in the receipt in the database
+****when dute date hasnt been set, dont show the date in listview
+****FIX when adding new list item, not reordering the list and navigating away and back to month gets null pointer
+	-the new item is being added to the sort order as Id=0 before the item is added to the DB and gets a valid Id
+	-in the FinancialMonth.Add methods, the new item was being added to list before Database and would trigger collection changed
+****put a number in the receipt/expense circle on calendar with the number of expense/receipt for that day (count)
+****save listviews drag and drop order so when you load it again its in the same order
+****added a calendar picker and updated display on expenses to change/store due date
+****added expenses (due dates) to the calendar year view
+****add a DueDate field to the expenses
+****FIX why is calendarview dates and shit suddenly missing? Added CalendarView style
+****sort receipts in calendar view when clicking cell by category, then by amount?
+****converted the receipts list for a calendar day to a flyout (had to disable the CellTapped command first)
+****bind the year view total to the total amount of receipts
+****style year view tooltip list like the income/expense/budget list style
+****FIX prevent clicking on the name of the month in header changes the page
+****implement year view tooltips over the days that contain receipt data
+****finish the receiptcalendardatapoints class and integrate it with the calendar
+****FIX binding and data for calendar
+	-set the datacontext of the yearview page to the currentyear instance instead of defining it in xaml
+****override and disable the movetonextview and movetopreviousview commands in radcalendar to prevent month switching with swipe
+****created framework for adding receipt/expense date into the calendar by overriding CellStyleSelector and creating CellModel Converter
+****implemented telerik RadCalendar on year view page, styled and override CellStateSelector to blackout dates not in the current month
+****transferred all the event handlers and view model to the financialmonth page
+****created test pages for all the other sections besides month view and tested navigation
+****turned MainPage.xaml into a shell page and put a Frame in the content section to host all the pages
+****move all style templates into a resource dictionary
+****put splitpane navigation buttons in a listbox and adjusted colors and margins
+****added pie chart to show how much is spent for each expense category
+****added bar graph to show how much youve spent of each budgt
+****FIX when current budget's name is change its not reflected on the receipts list section on right hand side until list reload (same)
+****when editing budget name with chart open, update the budget list so the name binds to chart (prop change wasnt there for label)
+****added calculator functionality
+****help/about button on hamburger menu (question mark icon)
+****added pie chart showing how much has been spent in each receipt category and how many receipts in category
+****update receipt/receiptlist functionality to work with charts
+****add a go to today button
+****reset receipt list view when current budget is deleted
+****add tooltips on listitem buttons (edit, complete, delete, add, etc)
+****Add regex to receipt editor amount with warning symbol and tooltip and disable the OK button on receipt editor until amount fixed
+****FIX: receipt/budget remaining totals not saving in database for new receipt or edited one
+****added loading screen when switching between months
+****make date picker only show month/year view to select - possible? - not really needed just yet
+****back/forward buttons around the month name to go to next/prev month (like in universal xaml pivot demo)
+****get rid of cancel button in content dialog and center the button
+****get rid of button pressed background on the receipt editor image overlay button for large image
+****change cursor in receipt editor image overlay to selector
+****finish receipt image functionality
+****picture import for adding recipts
+****find way to convert pdf to images
+****reset zoom level evertime you click back into the large image popup
+****FIX: when large image popup was shown, any further changes to image wouldnt update the binding in receipt editor
+	-had to bind the large image to the source of the receipteditor image instead of straight to the receipt.imageurl
+	-also had to bind imageurl to a valid file path that was different from the destination for bind to work (ised temp folder/file)
+****added receipt image file import from pdf functionality
+****remove spaces from image receipt filenames
+****in path to uri converted return a valid placeholder uri if receipt imageurl is null
+****put zeros in the date for a single digit month/day
+****FIX textboxes that dont show up italic on load when item has been marked completed
+	-changed to use background changed for ispaid or isclosed
+****implement recepit list item delete buttons
+****finished implementing and testing update receipt and add receipt functionality (except images)
+****add warning saing budget is closed and receipt editing is disabled
+****if budget is marked as completed, no new receipts can be added until you uncheck it
+****FIX when you hit add receipt you see the information of the previous selected receipt not the new one
+	-was setting the private currentReceipt variable instead of the property (propertychanged wasnt firing)
+****complete receipt editor, added a large image view with zoom capability using Popup and scrollviewer
+****mouse over image in receipt editor to see take photo/load image buttons and shade background
+****add and style the text entry fields and autosuggest boxes to receipt editor
+****autosuggest box for adding receipt categories and populate it with the list of current choices
+****add custom border to contentdialog
+****make background shading color of contentdialog darker
+****white underlines on receipt editor page text boxes for editable fields
+****update calendardatepicker style to remove the placeholder/binding text and addother styling
+****UWP Universal Demo XamlPivot "Headers" image view with popup design for receipt add/edit = ContentDialog
+****style the create receipt button
+****FIX if Payee is created with an existing name a duplicate is made
+****rebuilt entire Type/Payee engine for all but receipts
+****FIX when adding new Item and leaving the type as undefined it makes a new undefined IncomeTypeObject
+****FIX when clicking to choose type from autosuggest it actually enters the type as whats in the texbox at the time
+	-doesnt happen when hitting enter
+	-need to used args.ChosenSuggestion not sender.Text
+****put gradient on receipts section background color
+****pivot should only reach the right end of the window and no more
+	-this is becasue the whole row is in a scrollviewer.. turning off scrollviewer presents other problems
+****set minimum width on top relativepanel to avoid collisions
+****change receipt border color depending on receipt type, use binding and add color property to receipt class
+****searching within receipts section by label and payee and type (autosuggestbox?)
+****drop shadow on receipts in its list/gridview
+****if an expense/budget is marked as complete, disable the edit button on it (rework this bc of edit button binding)
+****create typeobjects for all enum types
+****put all types collections in a static class
+****bound the color of the complete button and the IsEnabled of the edit button to the complete properties to fix complete
+****FIX when incorrect budget amount is entered, remaining amount updates to sum of all receipts (amount=0 is twoway binded)
+****allowed editing of multiple list items at once due to the new binding of the UI related edit mode properties
+****completely reworked edit button click event method by using binding to update the UI
+****add check box to the right of expenses/budgets to mark as paid (dim the entry then?)
+****when you click on a budget it should take you to reciepts in the pivot, using ItemClick event on listview
+****pivot headers to look like expense/income/budget, edit PivotHeaderItem Style and Pivot.HeaderTemplate
+****add totals on expense, income, budget header
+****create AddNew<T> methods on the FinancialMonth to add new expense/income/budget with current month, year
+****clear recipts list when budget is selected then deleted by clearing the receiptslist before removing
+****FIX when adding/removing receipts, the recipt listview would not update
+	-user ObservableCollection as the SQLite Relationship variable for receipts in Budget class instead of List
+****when creating budget, the remaining amount should equal the entered total amount
+****find way to make sure the budget remaning amount stays in sync with the total amount when user changes it
+****write GetAllByMonth<T> database functions
+****find new way to update properties from twoway binding (putting Update in property setter creates database lock)
+	-update() occurs on edit/save button click
+****convert to using int for currency instead of double and update converter (MUST REBUILD AFTER CHANGING CONVERTER!)
+****add tabbed interface on right hand side using Pivot class
+****integrate the database backend into the main app and debug
+****build data model classes and integrate with Sqlite
+****FIX receipts listview only shows when you go over it with the mouse
+	-in TextBox, if Padding was not set (even to 0) then text insode it would not appear until mouseover, god knows why
+****FIX exceptions being thrown on BudgetList pointer entered and exited in GetChildren
+	-fixed for all by doing datacontext type check
+****disable current item deletebutton when editing
+****when items are added have them appear at the top and start in "edit" mode
+****create ViewModel
+****limit the number of characters in each listitem textbox
+****only allow one item at a timt to be edited
+****fix regex to allow $233,000.00, $400.00   working:   ^\$[1-9]\d{0,2}?(?:,\d{3})*(?:\.\d{2})$
+****prevent anything but a dollar amaount from being entered in the amount textbox
+****change style template for expense/income/etc X buttons (remove border, keep background transparent, color yello)
+****decrease he minimum width of a textbox in the style template
+****set add button disabled style to be completely transparent

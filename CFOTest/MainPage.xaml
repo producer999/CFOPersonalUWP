@@ -1,0 +1,632 @@
+﻿<Page
+    x:Class="CFOTest.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:CFOTest"
+    xmlns:toolkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:chart="using:Syncfusion.UI.Xaml.Charts"
+    xmlns:calc="using:Syncfusion.UI.Xaml.Controls.Input"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Storyboard x:Name="SettingsSlideInStoryboard">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SlideIn" Storyboard.TargetProperty="X">
+                <SplineDoubleKeyFrame KeyTime="0:0:0" Value="-750" />
+                <SplineDoubleKeyFrame KeyTime="0:0:.15" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SettingsPopup" Storyboard.TargetProperty="Opacity">
+                <SplineDoubleKeyFrame KeyTime="0:0:0" Value="0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:.15" Value="1" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Page.Resources>
+    
+    <SplitView x:Name="MySplitView" DisplayMode="CompactOverlay" IsPaneOpen="False" CompactPaneLength="50" OpenPaneLength="250">
+
+        <SplitView.Background>
+            <LinearGradientBrush StartPoint=".3,.3" EndPoint=".75,.75">
+                <GradientStop Color="#0043af" Offset=".0"/>
+                <GradientStop Color="#2f78ed" Offset="1"/>
+            </LinearGradientBrush>
+        </SplitView.Background>
+        
+        <SplitView.Pane>
+
+            <!-- SECTION NAVIGATOR -->
+            
+            <RelativePanel Background="Black" MinHeight="400">
+                <StackPanel Orientation="Vertical" Background="Black" RelativePanel.AlignTopWithPanel="True">
+                    <Button x:Name="HamburgerButton" FontFamily="Segoe MDL2 Assets" FontSize="20" 
+                            Content="&#xE700;" Foreground="#f6ff70" Margin="-1,0,0,0"
+                        Background="Transparent" Width="50" Height="50" Click="HamburgerButton_Click"
+                            Style="{StaticResource NoClickBackgroundButtonTemplate}"/>
+
+                    <ListBox x:Name="NavigationList"  SelectionMode="Single" Background="Transparent"
+                             SelectionChanged="NavigationMenu_SelectionChanged" >
+
+                        <ListBoxItem x:Name="MonthView" Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE8D1;" 
+                                            Foreground="#f6ff70" Margin="3,5,0,0"/>
+                                <TextBlock Text="Month View" Margin="24,0,0,0" Padding="0,4,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem x:Name="YearView" Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE787;" 
+                                        Foreground="#f6ff70" Margin="3,5,0,0"/>
+                                <TextBlock Text="Year View" Margin="24,0,0,0" Padding="0,4,0,0" FontSize="18" 
+                                   VerticalAlignment="Bottom" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem x:Name="SpecialBudgets" Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Assets/Roboto-Normal.ttf#Roboto" FontSize="28" Text="$" 
+                                 Foreground="#f6ff70" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Special Budgets" Margin="26,0,0,0" Padding="0,4,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem x:Name="ReceiptArchive" Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="20" Text="&#xE7B8;" 
+                                         Foreground="#f6ff70" Margin="3,5,0,0"/>
+                                <TextBlock Text="Receipt Archive" Margin="24,0,0,0" Padding="0,4,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                    </ListBox>
+                </StackPanel>
+                
+                <StackPanel Orientation="Vertical" Background="Black" RelativePanel.AlignBottomWithPanel="True">
+                    <StackPanel Orientation="Horizontal">
+                        <Button FontFamily="Segoe MDL2 Assets" FontSize="20" Content="&#xE8EF;" Foreground="#f6ff70"
+                        Background="Transparent" Width="50" Height="50"
+                                Style="{StaticResource NoClickBackgroundButtonTemplate}"
+                                Click="CalculatorButton_Click"/>
+                        <TextBlock Text="Calculator" Margin="9,0,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button FontFamily="Segoe MDL2 Assets" FontSize="25" Content="&#xE897;" 
+                                Style="{StaticResource NoClickBackgroundButtonTemplate}"
+                                       Foreground="#f6ff70" Background="Transparent" Margin="2,1,0,0"
+                                Click="HelpButton_Click"/>
+                        <TextBlock Text="Help" Margin="12,0,0,0" Padding="0,4,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Tapped="SettingsButton_Tapped">
+                        <Button FontFamily="Segoe MDL2 Assets" FontSize="20" Content="&#xE713;" Foreground="#f6ff70"
+                        Background="Transparent" Width="50" Height="50"
+                                Style="{StaticResource NoClickBackgroundButtonTemplate}"/>
+                        <TextBlock Text="Settings" Margin="9,0,0,0" FontSize="18" 
+                                   VerticalAlignment="Center" Foreground="White"
+                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                    </StackPanel>
+                </StackPanel>
+            </RelativePanel>
+            
+        </SplitView.Pane>
+
+        <!-- MAIN CONTENT -->
+        
+        <SplitView.Content>
+            <Grid>
+
+                <!-- MAIN CONTENT FRAME FOR UI PAGES -->
+
+                <Frame x:Name="ContentFrame">
+                    <Frame.ContentTransitions>
+                        <TransitionCollection>
+                            <NavigationThemeTransition>
+                                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                                    <EntranceNavigationTransitionInfo/>
+                                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                            </NavigationThemeTransition>
+                        </TransitionCollection>
+                    </Frame.ContentTransitions>
+                </Frame>
+
+                <!-- HELP DIALOGUE -->
+
+                <ContentDialog Grid.Row="1" x:Name="HelpDialogue" Height="475" Width="775" 
+                               MaxWidth="775" MinWidth="775" MaxHeight="600" MinHeight="475"
+                               PrimaryButtonText="OK" IsPrimaryButtonEnabled="True"
+                               PrimaryButtonStyle="{StaticResource ReceiptEditorButtonStyle}"
+                               Background="DarkBlue">
+
+                    <Grid Height="475" Width="775">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <RelativePanel Grid.Row="0">
+
+                            <toolkit:DropShadowPanel x:Name="ReceiptEditorBudgetText" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                     RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                <TextBlock Text="v 1.1.6 11/25/17"  Margin="0,0,53,0" FontSize="23" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto" Foreground="LightSeaGreen"/>
+                            </toolkit:DropShadowPanel>
+
+                        </RelativePanel>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ScrollViewer IsHorizontalRailEnabled="False" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
+                                          IsVerticalRailEnabled="True" VerticalScrollBarVisibility="Auto">
+                                <RelativePanel>
+
+                                    <StackPanel x:Name="MainLogoPanel" Orientation="Vertical" RelativePanel.AlignLeftWithPanel="True">
+                                        <toolkit:ImageEx x:Name="CFOLogo" Margin="60,80,0,0" Width="300" Padding="0"
+                                             IsCacheEnabled="True">
+                                            <toolkit:ImageEx.Source>
+                                                <BitmapImage UriSource="ms-appx:///Assets/cfologo700x700.png"/>
+                                            </toolkit:ImageEx.Source>
+                                        </toolkit:ImageEx>
+
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" RelativePanel.RightOf="MainLogoPanel" Margin="90,50,0,0">
+                                        <toolkit:DropShadowPanel x:Name="CFOTitleText" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                     RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                            <TextBlock Text="CFO"  Margin="0" FontSize="40" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                                    Foreground="White"/>
+                                        </toolkit:DropShadowPanel>
+                                        <toolkit:DropShadowPanel x:Name="CFOSubtitleText" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,5,0,0"
+                                                     RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                            <TextBlock Text="Personal Edition"  Margin="0" FontSize="27" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="#f6ff70"/>
+                                        </toolkit:DropShadowPanel>
+                                        <TextBlock Text="© 2017 sourcEleven"  Margin="0,30,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White"/>
+                                        <TextBlock Text="Programmed by The Architect"  Margin="0,5,0,0" FontSize="14" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White"/>
+
+                                        <StackPanel Orientation="Horizontal" Height="30">
+                                            <TextBlock x:Name="TrialVersionLabel"  Text="Trial Version -" Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="15"
+                                                   FontWeight="Bold" Margin="0,10,0,0" Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"/>
+                                            <TextBlock x:Name="TrialVersionExpiration"  Text="{x:Bind AppSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetTrialDaysFormatConverter}}" 
+                                                   Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="15"
+                                                   Margin="2,10,10,0" FontWeight="Bold"
+                                                   Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Height="30">
+                                            <TextBlock x:Name="TrialVersionExpLabel"  Text="Expires: " Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="15"
+                                                   FontWeight="Bold" Margin="0,10,0,0" Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"/>
+                                            <TextBlock x:Name="TrialVersionExpDate"  Text="{x:Bind AppSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetFormatConverter}}" 
+                                                   Foreground="Red" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="15"
+                                                   Margin="2,10,10,0" FontWeight="Bold"
+                                                   Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"/>
+                                        </StackPanel>
+
+                                        <Button x:Name="BuyButton" Content="Buy Now" Margin="17,20,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20"
+                                                        Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"
+                                                        Click="BuyNow_Click">
+                                        </Button>
+
+                                        <TextBlock Text="For help and documentation go to:"  Margin="0,10,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White" />
+
+                                        <HyperlinkButton Content="www.sourceleven.com/cfohelp.html" NavigateUri="http://www.sourceleven.com/cfohelp.html"
+                                                         FontFamily="Assets/Roboto-Regular.ttf#Roboto" Margin="0,5,0,0" FontSize="15"/>
+
+                                        <TextBlock Text="Privacy policy:"  Margin="0,10,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White"/>
+
+                                        <HyperlinkButton Content="www.sourceleven.com/cfoprivacy.html" NavigateUri="http://www.sourceleven.com/cfoprivacy.html"
+                                                         FontFamily="Assets/Roboto-Regular.ttf#Roboto" Margin="0,5,0,0" FontSize="15"/>
+
+
+                                    </StackPanel>
+
+
+                                </RelativePanel>
+                            </ScrollViewer>
+
+                        </Grid>
+                    </Grid>
+
+
+
+                </ContentDialog>
+                
+                <!-- APP PURCHASE DIALOGUE -->
+
+                <ContentDialog Grid.Row="1" x:Name="PurchaseDialogue" Height="475" Width="775" 
+                               MaxWidth="775" MinWidth="775" MaxHeight="600" MinHeight="475"
+                               PrimaryButtonText="OK" IsPrimaryButtonEnabled="True"
+                               PrimaryButtonStyle="{StaticResource ReceiptEditorButtonStyle}"
+                               Background="DarkBlue">
+
+                    <Grid Height="475" Width="775">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <RelativePanel Grid.Row="0">
+
+                            <toolkit:DropShadowPanel x:Name="ReceiptEditorBudgetText2" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                     RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                <TextBlock Text="Confirmation"  Margin="0,0,53,0" FontSize="23" TextAlignment="Left" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto" Foreground="LightSeaGreen"/>
+                            </toolkit:DropShadowPanel>
+
+                        </RelativePanel>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ScrollViewer IsHorizontalRailEnabled="False" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"
+                                          IsVerticalRailEnabled="True" VerticalScrollBarVisibility="Auto">
+                                <RelativePanel>
+
+                                    <StackPanel x:Name="MainLogoPanel2" Orientation="Vertical" RelativePanel.AlignLeftWithPanel="True">
+                                        <toolkit:ImageEx x:Name="CFOLogo2" Margin="60,80,0,0" Width="300" Padding="0"
+                                             IsCacheEnabled="True">
+                                            <toolkit:ImageEx.Source>
+                                                <BitmapImage UriSource="ms-appx:///Assets/cfologo700x700.png"/>
+                                            </toolkit:ImageEx.Source>
+                                        </toolkit:ImageEx>
+
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" RelativePanel.RightOf="MainLogoPanel2" Margin="90,50,0,0">
+                                        <toolkit:DropShadowPanel x:Name="ThankYouText" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                     RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                            <TextBlock Text="Thank you!"  Margin="0" FontSize="40" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                                    Foreground="White"/>
+                                        </toolkit:DropShadowPanel>
+                                        <toolkit:DropShadowPanel x:Name="ThankYouText2" BlurRadius="2" ShadowOpacity="0.7" OffsetX="3" OffsetY="3"
+                                                         Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,5,0,0"
+                                                     RelativePanel.AlignLeftWithPanel="True" RelativePanel.AlignTopWithPanel="True">
+                                            <TextBlock Text="For your purchase"  Margin="0" FontSize="27" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="#f6ff70"/>
+                                        </toolkit:DropShadowPanel>
+                                        <TextBlock Text="You may now use all of the features of the CFO App."  Margin="0,30,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" Width="250" HorizontalAlignment="Left"
+                                                    Foreground="White" TextWrapping="Wrap"/>
+                                        <TextBlock Text="Note: You may still see warnings about the Trial Version until you restart the app."  Margin="0,30,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" TextWrapping="Wrap" Width="250" HorizontalAlignment="Left"
+                                                    Foreground="White"/>
+
+                                        <TextBlock Text="Enjoy!"  Margin="0,30,0,0" FontSize="20" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Normal.ttf#Roboto" 
+                                                    Foreground="White"/>
+
+                                        <TextBlock Text="- The sourcEleven Team"  Margin="0,30,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White"/>
+
+
+
+                                        <!--<TextBlock Text="For help and documentation go to:"  Margin="0,10,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White" />
+
+                                        <HyperlinkButton Content="www.sourceleven.com/cfohelp.html" NavigateUri="http://www.sourceleven.com/cfohelp.html"
+                                                         FontFamily="Assets/Roboto-Regular.ttf#Roboto" Margin="0,5,0,0" FontSize="15"/>
+
+                                        <TextBlock Text="Privacy policy:"  Margin="0,10,0,0" FontSize="16" TextAlignment="Left" VerticalAlignment="Center"
+                                                   FontFamily="Assets/Roboto-Thin.ttf#Roboto" 
+                                                    Foreground="White"/>
+
+                                        <HyperlinkButton Content="www.sourceleven.com/cfoprivacy.html" NavigateUri="http://www.sourceleven.com/cfoprivacy.html"
+                                                         FontFamily="Assets/Roboto-Regular.ttf#Roboto" Margin="0,5,0,0" FontSize="15"/>-->
+
+
+                                    </StackPanel>
+
+
+                                </RelativePanel>
+                            </ScrollViewer>
+
+                        </Grid>
+                    </Grid>
+
+
+
+                </ContentDialog>
+
+                <!-- CALCULATOR POPUP -->
+
+                <local:FloatingContent x:Name="CalculatorPopup" Boundary="Window" Visibility="Collapsed">
+                    <Border BorderBrush="White" BorderThickness="2" CornerRadius="4"
+                             Background="DarkBlue">
+                        <calc:SfCalculator x:Name="Calculator"/>
+                    </Border>
+                </local:FloatingContent>
+
+                <!-- LOADING PROGRESS PAGE -->
+
+                <toolkit:Loading x:Name="LoadingPage" HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"
+                                 Background="DarkBlue" Opacity=".9"
+                                 Grid.Row="0" Grid.RowSpan="2">
+                    <RelativePanel>
+                        <ProgressRing x:Name="LoadingRing" IsActive="True" RelativePanel.AlignLeftWithPanel="True"
+                                      Foreground="White"
+                                      Height="60" Width="60"/>
+                        <TextBlock RelativePanel.RightOf="LoadingRing"
+                                   Text="Loading Data..." Margin="20,10,10,10"
+                                   Foreground="White" FontSize="35" FontFamily="Assets/Roboto-Bold.ttf#Roboto"/>
+                    </RelativePanel>
+                </toolkit:Loading>
+
+                <!-- SETTINGS POPUP -->
+
+                <Popup x:Name="SettingsPopup" HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch" Opacity="0"
+                       IsLightDismissEnabled="False">
+                    
+                    <Border x:Name="SettingsPopupBorder" BorderBrush="White" BorderThickness="2" CornerRadius="4"
+                            HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="DarkBlue" Offset=".0"/>
+                                <GradientStop Color="#2b2be2" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollMode="Auto" VerticalScrollMode="Auto">
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- TOP CONTROL STRIP -->
+
+                                <RelativePanel Grid.Row="0">
+
+                                    <TextBlock Text="PLACEHOLDER" Foreground="White" FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="20"
+                               Margin="10,13,10,0" RelativePanel.AlignLeftWithPanel="True" VerticalAlignment="Center" Opacity="0"/>
+
+                                </RelativePanel>
+
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- HEADER DISPLAY -->
+
+                                    <RelativePanel Grid.Row="0" MinWidth="1020">
+
+                                        <Border x:Name="SettingsDisplay" BorderThickness="3" Grid.Row="0" Margin="10,0,10,0" 
+                                                BorderBrush="White" CornerRadius="5" HorizontalAlignment="Left"
+                                                RelativePanel.AlignLeftWithPanel="True" Background="Transparent">
+                                            <RelativePanel HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Settings" 
+                                                         Margin="20,15,20,20" Foreground="White" FontSize="60" FontWeight="Bold"/>
+                                            </RelativePanel>
+                                        </Border>
+                                    </RelativePanel>
+
+                                    <Grid Grid.Row="1" >
+
+                                        <!-- MAIN SECTION -->
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" Orientation="Vertical" Margin="20,40,0,20">
+
+                                                <toolkit:DropShadowPanel x:Name="DisplayOptionsHeader" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2">
+                                                    <TextBlock x:Name="DisplayOptionsText"  Margin="0,10,-8,0" Text="Display Options" Foreground="#f6ff70"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                                                </toolkit:DropShadowPanel>
+
+                                                <TextBlock Text="Show Confirmation Dialogs on Delete" Foreground="White" FontSize="17"
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,25,0,5"/>
+
+                                                <ToggleSwitch x:Name="DisableConfirmationDialog" Margin="20,0,10,10" Foreground="White"
+                                                      FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="17"
+                                                          IsOn="{x:Bind AppSettings.DisableConfirmationDialogs, Mode=TwoWay, Converter={StaticResource InverseBoolConverter}}"
+                                                   OffContent="Disabled" OnContent="Enabled"/>
+
+                                                <toolkit:DropShadowPanel x:Name="ThemesHeader" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2">
+                                                    <TextBlock x:Name="ThemesOptionsText"  Margin="0,10,-8,0" Text="Themes / Colors" Foreground="#f6ff70"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                                                </toolkit:DropShadowPanel>
+
+
+                                                <TextBlock Text="COMING SOON!" Foreground="White" FontSize="17"
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,25,0,15"/>
+
+                                                <toolkit:DropShadowPanel x:Name="ImageOptionsHeader" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2">
+                                                    <TextBlock x:Name="ImageOptionsText"  Margin="0,10,-8,0" Text="Image Options" Foreground="#f6ff70"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                                                </toolkit:DropShadowPanel>
+
+                                                <TextBlock Text="Receipts Backup Folder" Foreground="White" FontSize="17"
+                                                          FontFamily="Assets/Roboto-BOld.ttf#Roboto" Margin="20,25,0,10"/>
+
+                                                <StackPanel Orientation="Horizontal" Margin="30,0,0,0">
+                                                    <TextBlock Text="{x:Bind AppSettings.ReceiptBackupFolder, Mode=OneWay}" Foreground="LightSeaGreen"
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="10,22,30,0" FontSize="20"/>
+
+                                                    <Button x:Name="ChooseImageFolder" Content="Choose Folder" Margin="17,10,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" Visibility="Visible" IsEnabled="True"
+                                                        Click="{x:Bind AppSettings.ChooseReceiptBackupFolder}"/>
+
+                                                    <Button x:Name="BackupImagesButton" Content="Backup Now" Margin="17,10,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" Visibility="Visible" IsEnabled="{x:Bind AppSettings.IsReceiptFolderSet, Mode=OneWay}"
+                                                        Click="{x:Bind AppSettings.BackupReceipts}"/>
+                                                </StackPanel>
+
+                                                <TextBlock Text="Automatically Backup Receipts" Foreground="White" FontSize="17"
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,25,0,5"/>
+
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ToggleSwitch x:Name="AutoBackupReceipts" Margin="20,0,10,10" Foreground="White"
+                                                      FontFamily="Assets/Roboto-Thin.ttf#Roboto" FontSize="17"
+                                                          IsEnabled="{x:Bind AppSettings.IsReceiptFolderSet, Mode=OneWay}"
+                                                          IsOn="{x:Bind AppSettings.AutomaticallyBackupReceipts, Mode=TwoWay}"
+                                                   OffContent="Disabled" OnContent="Enabled"/>
+                                                    <TextBlock Text="Last Backup: " Foreground="White" FontSize="17"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="20,10,0,5"/>
+                                                    <TextBlock Text="{x:Bind AppSettings.LastReceiptBackupDate, Mode=OneWay}" Foreground="LightSeaGreen" FontSize="17"
+                                                           Visibility="{x:Bind AppSettings.IsLastReceiptBackupDateSet, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,10,0,5"/>
+                                                </StackPanel>
+
+
+                                                <toolkit:DropShadowPanel x:Name="OtherOptionsHeader" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2">
+                                                    <TextBlock x:Name="OtherOptionsText"  Margin="0,10,-8,0" Text="Other" Foreground="#f6ff70"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                                                </toolkit:DropShadowPanel>
+
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button x:Name="ClearTempFolderButton" Content="Clear Temp Folder" Margin="20,25,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" Visibility="Visible"
+                                                        Click="{x:Bind AppSettings.ClearTempFolder}">
+                                                    </Button>
+
+                                                    <Button x:Name="ClearDeletedReceiptsButton" Content="Clear Deleted Receipts" Margin="20,25,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" Height="50"
+                                                        FontSize="20" Visibility="Visible"
+                                                        Click="ClearDeletedReceipts_Click"
+                                                        IsEnabled="{x:Bind AppSettings.IsReceiptClearInProgress, Mode=OneWay, Converter={StaticResource InverseBoolConverter}}">
+                                                    </Button>
+                                                    <ProgressRing IsActive="{x:Bind AppSettings.IsReceiptClearInProgress, Mode=OneWay}"
+                                                            Margin="10,27,10,10" Width="32" Height="32"/>
+                                                </StackPanel>
+
+
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Orientation="Vertical" Margin="20,40,0,20">
+                                                
+                                                <toolkit:DropShadowPanel x:Name="LicenseStatusHeader" BlurRadius="2" ShadowOpacity="0.7" OffsetX="2" OffsetY="13"
+                                                                 Color="Black" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2">
+                                                    <TextBlock x:Name="LicenseStstusText"  Margin="0,10,-8,0" Text="License Status" Foreground="#f6ff70"
+                                                            FontFamily="Assets/Roboto-Bold.ttf#Roboto" FontSize="21"/>
+                                                </toolkit:DropShadowPanel>
+
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="Status: " Foreground="White" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"/>
+                                                    <TextBlock Text="Active" Foreground="LightSeaGreen" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"
+                                                               Visibility="{x:Bind AppSettings.IsLicenseActive, Mode=OneWay}"/>
+                                                    <TextBlock Text="Inactive" Foreground="Red" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"
+                                                               Visibility="{x:Bind AppSettings.IsLicenseActive, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                                                </StackPanel>
+
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="License Type: " Foreground="White" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"/>
+                                                    <TextBlock Text="Trial License" Foreground="Red" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"
+                                                               Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"/>
+                                                    <TextBlock Text="Full License" Foreground="LightSeaGreen" FontSize="17" 
+                                                          FontFamily="Assets/Roboto-Bold.ttf#Roboto" Margin="20,15,0,5"
+                                                               Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                                    
+                                                </StackPanel>
+
+
+                                                <StackPanel Orientation="Horizontal" Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}">
+                                                    <TextBlock Text="Days remaining in trial:" Foreground="White" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="25,10,0,5"/>
+                                                    <TextBlock Text="{x:Bind AppSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetTrialDaysFormatConverter}}" Foreground="Yellow" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="20,10,0,5"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}">
+                                                    <TextBlock Text="Expiration date:" Foreground="White" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="25,10,0,5"/>
+                                                    <TextBlock Text="{x:Bind AppSettings.TrialExpirationDate, Mode=OneWay, Converter={StaticResource DateOffsetFormatConverter}}" 
+                                                               Foreground="Yellow" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="20,10,0,5"/>
+                                                </StackPanel>
+
+                                                <Button x:Name="BuyButton2" Content="Buy Now" Margin="23,20,10,8" BorderBrush="White" BorderThickness="2" 
+                                                        Background="#2f78ed" Foreground="Yellow" FontWeight="Bold" FontFamily="Assets/Roboto-Bold.ttf#Roboto" 
+                                                        Height="50" FontSize="20"
+                                                        Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay}"
+                                                        Click="BuyNow_Click">
+                                                </Button>
+
+                                                <StackPanel Orientation="Horizontal" Visibility="{x:Bind AppSettings.IsLicenseTrial, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                    <TextBlock Text="Purchase date:" Foreground="White" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="25,10,0,5"/>
+                                                    <TextBlock Text="{x:Bind AppSettings.PurchaseDate, Mode=OneWay, Converter={StaticResource DateFormatConverter}}" Foreground="White" FontSize="16" FontWeight="Bold"
+                                                          FontFamily="Assets/Roboto-Thin.ttf#Roboto" Margin="20,10,0,5"/>
+                                                </StackPanel>
+
+                                            </StackPanel>
+                                            
+                                        </Grid>
+
+                                    </Grid>
+                                </Grid>
+
+                            </Grid>
+
+                        </ScrollViewer>
+                    </Border>
+                    
+                    <Popup.RenderTransform>
+                        <TranslateTransform x:Name="SlideIn" X="-750" />
+                    </Popup.RenderTransform>
+                    
+                </Popup>
+
+            </Grid>
+
+        </SplitView.Content>
+        
+
+
+
+    </SplitView>
+
+</Page>
